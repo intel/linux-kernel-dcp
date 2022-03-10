@@ -47,7 +47,6 @@ unsigned int x86_model(unsigned int sig);
 unsigned int x86_stepping(unsigned int sig);
 #ifdef CONFIG_CPU_SUP_INTEL
 extern void __init sld_setup(struct cpuinfo_x86 *c);
-extern void switch_to_sld(unsigned long tifn);
 extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
 extern bool handle_guest_split_lock(unsigned long ip);
 extern void handle_bus_lock(struct pt_regs *regs);
@@ -56,7 +55,6 @@ extern u64 tsx_ctrl_clear(void);
 extern void tsx_ctrl_restore(u64 tsx_ctrl);
 #else
 static inline void __init sld_setup(struct cpuinfo_x86 *c) {}
-static inline void switch_to_sld(unsigned long tifn) {}
 static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
 {
 	return false;
