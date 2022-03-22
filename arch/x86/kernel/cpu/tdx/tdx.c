@@ -987,6 +987,15 @@ static int __init tdx_arch_init(void)
 			goto out;
 		}
 		pr_info("Loaded TDX module via P-SEAMLDR.\n");
+	} else if ((bootloader_type >> 4) == 0xd){
+		pr_info("It's a kexec'ed kernel, loading new TDX module kernel itself to overwrite old one\n");
+
+		ret = tdx_load_module_boot();
+		if (ret) {
+			pr_info("Failed to load TDX module.\n");
+			goto out;
+		}
+		pr_info("Loaded TDX module via P-SEAMLDR.\n");
 	}
 	set_tdx_module_state(TDX_MODULE_LOADED);
 
