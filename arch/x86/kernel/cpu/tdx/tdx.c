@@ -921,7 +921,7 @@ out:
 	return ret;
 }
 
-static int tdx_load_module_boot(void)
+static int __init tdx_load_module_boot(void)
 {
 	struct cpio_data module, sigstruct;
 
