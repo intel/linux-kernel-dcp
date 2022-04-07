@@ -685,8 +685,8 @@ static void vidxd_mmio_init_wqcfg(struct vdcm_idxd *vidxd)
 	wqcfg->bof = wq->wqcfg->bof;
 
 	wqcfg->priority = wq->priority;
-	wqcfg->max_xfer_shift = idxd->hw.gen_cap.max_xfer_shift;
-	wqcfg->max_batch_shift = idxd->hw.gen_cap.max_batch_shift;
+	wqcfg->max_xfer_shift = ilog2(wq->max_xfer_bytes);
+	wqcfg->max_batch_shift = ilog2(wq->max_batch_size);
 	wqcfg->mode_support = 1;
 }
 
