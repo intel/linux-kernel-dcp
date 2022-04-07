@@ -804,8 +804,14 @@ static int xs_nospace(struct rpc_rqst *req)
 static int
 xs_stream_prepare_request(struct rpc_rqst *req)
 {
+	gfp_t gfp = rpc_task_gfp_mask();
+	int ret;
+
+	ret = xdr_alloc_bvec(&req->rq_snd_buf, gfp);
+	if (ret < 0)
+		return ret;
 	xdr_free_bvec(&req->rq_rcv_buf);
-	return xdr_alloc_bvec(&req->rq_rcv_buf, GFP_KERNEL);
+	return xdr_alloc_bvec(&req->rq_rcv_buf, gfp);
 }
 
 /*
@@ -935,6 +941,9 @@ static int xs_udp_send_request(struct rpc_rqst *req)
 	if (!xprt_request_get_cong(xprt, req))
 		return -EBADSLT;
 
+	status = xdr_alloc_bvec(xdr, rpc_task_gfp_mask());
+	if (status < 0)
+		return status;
 	req->rq_xtime = ktime_get();
 	status = xprt_sock_sendmsg(transport->sock, &msg, xdr, 0, 0, &sent);
 
@@ -2557,6 +2566,9 @@ static int bc_sendto(struct rpc_rqst *req)
 	int err;
 
 	req->rq_xtime = ktime_get();
+	err = xdr_alloc_bvec(xdr, rpc_task_gfp_mask());
+	if (err < 0)
+		return err;
 	err = xprt_sock_sendmsg(transport->sock, &msg, xdr, 0, marker, &sent);
 	xdr_free_bvec(xdr);
 	if (err < 0 || sent != (xdr->len + sizeof(marker)))
