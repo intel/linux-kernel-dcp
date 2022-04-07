@@ -433,7 +433,7 @@ int idxd_wq_abort(struct idxd_wq *wq, u32 *status)
 }
 EXPORT_SYMBOL_GPL(idxd_wq_abort);
 
-static void __idxd_wq_set_priv_locked(struct idxd_wq *wq)
+static void __idxd_wq_set_priv_locked(struct idxd_wq *wq, int priv)
 {
 	struct idxd_device *idxd = wq->idxd;
 	union wqcfg wqcfg;
@@ -442,7 +442,7 @@ static void __idxd_wq_set_priv_locked(struct idxd_wq *wq)
 	offset = WQCFG_OFFSET(idxd, wq->id, WQCFG_PRIV_IDX);
 	spin_lock(&idxd->dev_lock);
 	wqcfg.bits[WQCFG_PRIV_IDX] = ioread32(idxd->reg_base + offset);
-	wqcfg.priv = 1;
+	wqcfg.priv = priv;
 	wq->wqcfg->bits[WQCFG_PRIV_IDX] = wqcfg.bits[WQCFG_PRIV_IDX];
 	iowrite32(wqcfg.bits[WQCFG_PRIV_IDX], idxd->reg_base + offset);
 	spin_unlock(&idxd->dev_lock);
@@ -1447,12 +1447,12 @@ int __drv_enable_wq(struct idxd_wq *wq)
 
 				__idxd_wq_set_pasid_locked(wq, pasid);
 			}
-			__idxd_wq_set_priv_locked(wq);
+			__idxd_wq_set_priv_locked(wq, 1);
 		} else {
 			if (device_user_pasid_enabled(idxd) && wq_shared(wq))
 				__idxd_wq_set_pasid_locked(wq, 0);
+			__idxd_wq_set_priv_locked(wq, 0);
 		}
-
 	}
 
 	rc = 0;
