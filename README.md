@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.5
+----------------
+93. Perf: Read call chain from CET shadow stack (Kan Liang)
+
 SPR-BKC-PC-v5.4
 ----------------
 92. Load a new TDX module to overwrite old one (Xiaoyao Li)
