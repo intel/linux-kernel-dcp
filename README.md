@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.4
+----------------
+92. Load a new TDX module to overwrite old one (Xiaoyao Li)
+
 SPR-BKC-PC-v5.3
 ----------------
 91. Fix TLB flushing issue for TDX guest's private pages (Yuan Yao)
