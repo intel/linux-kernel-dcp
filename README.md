@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.8
+----------------
+96. DSA fixes (Dave Jiang)
+
 SPR-BKC-PC-v5.7
 ----------------
 95. ifs: Remove version check during IFS binary load (Jithu Joseph)
