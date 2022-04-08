@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.6
+----------------
+94. TDX guest fixes (Kuppuswamy Sathyanarayanan)
+
 SPR-BKC-PC-v5.5
 ----------------
 93. Perf: Read call chain from CET shadow stack (Kan Liang)
