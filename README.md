@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.7
+----------------
+95. ifs: Remove version check during IFS binary load (Jithu Joseph)
+
 SPR-BKC-PC-v5.6
 ----------------
 94. TDX guest fixes (Kuppuswamy Sathyanarayanan)
