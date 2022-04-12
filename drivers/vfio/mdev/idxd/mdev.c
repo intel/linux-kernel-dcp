@@ -2427,8 +2427,13 @@ static void idxd_mdev_drv_remove(struct idxd_dev *idxd_dev)
 	mutex_unlock(&wq->wq_lock);
 
 	mutex_lock(&idxd->kref_lock);
-	if (idxd->mdev_host_init)
+	if (idxd->mdev_host_init) {
 		kref_put(&idxd->mdev_kref, idxd_mdev_host_release);
+
+		/* kref init at 1, when it hits 1, no more devices and we can release */
+		if (kref_read(&idxd->mdev_kref) == 1)
+			kref_put(&idxd->mdev_kref, idxd_mdev_host_release);
+	}
 	mutex_unlock(&idxd->kref_lock);
 	put_device(dev);
 	dev_info(dev, "wq %s disabled\n", dev_name(dev));
