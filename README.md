@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.11
+----------------
+99. IDXD fix (Dave Jiang)
+
 SPR-BKC-PC-v5.10
 ----------------
 98. CVE fixes (Mark Horn)
