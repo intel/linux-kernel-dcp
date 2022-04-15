@@ -40,7 +40,7 @@ static DEFINE_MUTEX(attestation_lock);
 /* Completion object to track attestation status */
 static DECLARE_COMPLETION(attestation_done);
 /* Buffer used to copy report data in attestation handler */
-static u8 report_data[TDX_REPORT_DATA_LEN] __aligned(64);
+static void *report_data;
 /* Data pointer used to get TD Quote data in attestation handler */
 static void *tdquote_data;
 /* Data pointer used to get TDREPORT data in attestation handler */
@@ -195,6 +195,12 @@ static int __init tdx_attest_init(void)
 		goto failed;
 	}
 
+	report_data = kmalloc(TDX_REPORT_DATA_LEN, GFP_KERNEL);
+	if (!report_data) {
+		ret = -ENOMEM;
+		goto failed;
+	}
+
 	ret = dma_set_coherent_mask(tdx_attest_device.this_device,
 				    DMA_BIT_MASK(64));
 	if (ret) {
@@ -223,6 +229,9 @@ static int __init tdx_attest_init(void)
 	return 0;
 
 failed:
+	if (report_data)
+		kfree(report_data);
+
 	if (tdreport_data)
 		free_pages((unsigned long)tdreport_data, 0);
 
@@ -241,6 +250,7 @@ static void __exit tdx_attest_exit(void)
 
 	dma_free_coherent(tdx_attest_device.this_device, GET_QUOTE_MAX_SIZE,
 			  tdquote_data, tdquote_dma_handle);
+	kfree(report_data);
 	free_pages((unsigned long)tdreport_data, 0);
 	misc_deregister(&tdx_attest_device);
 	/* Unregister attestation event notify handler */
