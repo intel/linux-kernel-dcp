@@ -2413,14 +2413,8 @@ static void idxd_mdev_drv_remove(struct idxd_dev *idxd_dev)
 	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
 	struct idxd_device *idxd = wq->idxd;
 
-
 	mutex_lock(&wq->wq_lock);
 	__drv_disable_wq(wq);
-
-	if (wq->state == IDXD_WQ_DISABLED) {
-		mutex_unlock(&wq->wq_lock);
-		return;
-	}
 
 	if (wq->state == IDXD_WQ_LOCKED)
 		wq->state = IDXD_WQ_DISABLED;
