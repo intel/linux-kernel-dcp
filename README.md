@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v5.12
+----------------
+100. One IDXD fix (Dave Jiang) and one TDX performance fix (Chao Gao)
+
 SPR-BKC-PC-v5.11
 ----------------
 99. IDXD fix (Dave Jiang)
