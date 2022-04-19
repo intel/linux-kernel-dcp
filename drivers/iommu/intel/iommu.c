@@ -52,6 +52,17 @@
 
 #define ROOT_SIZE		VTD_PAGE_SIZE
 #define CONTEXT_SIZE		VTD_PAGE_SIZE
+/* PRS_Allocation */
+static int prs_allocation = 32;
+
+/* PRQ_Size, use large enough size to avoid PRQ overflow, on SPR the sum of
+ * DSA, IAX/A, QAT = 512 + 256 + 64, round up to power of 2 is 1024.
+ * Since we process the PRQ once then move QH, we need to double that
+ * to 2048 entries. Each 4K page can hold 128 entries. So we need 64KB
+ * in total to prevent PRQ overflow in the worst case.
+ * For default 32 entries per dev,8 KB should be enough.
+ */
+int prq_size_page_order = 1;
 
 #define IS_GFX_DEVICE(pdev) ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY)
 #define IS_USB_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_SERIAL_USB)
@@ -476,6 +487,26 @@ static int __init intel_iommu_setup(char *str)
 		} else if  (!strncmp(str, "sm_off", 6)) {
 			pr_info("Intel-IOMMU: scalable mode disabled\n");
 			intel_iommu_sm = 0;
+		} else if (!strncmp(str, "prq_size_4kb", 12)) {
+			prq_size_page_order = 0;
+		} else if (!strncmp(str, "prq_size_8kb", 12)) {
+			prq_size_page_order = 1;
+		} else if (!strncmp(str, "prq_size_16kb", 13)) {
+			prq_size_page_order = 2;
+		} else if (!strncmp(str, "prq_size_32kb", 13)) {
+			prq_size_page_order = 3;
+		} else if (!strncmp(str, "prq_size_64kb", 13)) {
+			prq_size_page_order = 4;
+		} else if (!strncmp(str, "prs_allocation_32", 17)) {
+			prs_allocation = 32;
+		} else if (!strncmp(str, "prs_allocation_64", 17)) {
+			prs_allocation = 64;
+		} else if (!strncmp(str, "prs_allocation_128", 18)) {
+			prs_allocation = 128;
+		} else if (!strncmp(str, "prs_allocation_256", 18)) {
+			prs_allocation = 256;
+		} else if (!strncmp(str, "prs_allocation_512", 18)) {
+			prs_allocation = 512;
 		} else if (!strncmp(str, "tboot_noforce", 13)) {
 			pr_info("Intel-IOMMU: not forcing on after tboot. This could expose security risk for tboot\n");
 			intel_iommu_tboot_noforce = 1;
@@ -494,6 +525,21 @@ static int __init intel_iommu_setup(char *str)
 	return 0;
 }
 __setup("intel_iommu=", intel_iommu_setup);
+
+static int __init intel_prs_allocation_setup(char *str)
+{
+	if (!str)
+		return -EINVAL;
+
+	if (kstrtoint(str, 10, &prs_allocation) < 0)
+		pr_info("prs_allocation: wrong parameter %s %d\n", str, prs_allocation);
+
+
+	pr_info("prs_allocation set to %d\n", prs_allocation);
+
+	return 1;
+}
+__setup("prs_allocation=", intel_prs_allocation_setup);
 
 static struct kmem_cache *iommu_domain_cache;
 static struct kmem_cache *iommu_devinfo_cache;
@@ -1573,7 +1619,7 @@ static void iommu_enable_dev_iotlb(struct device_domain_info *info)
 
 	if (info->pri_supported &&
 	    (info->pasid_enabled ? pci_prg_resp_pasid_required(pdev) : 1)  &&
-	    !pci_reset_pri(pdev) && !pci_enable_pri(pdev, 32))
+	    !pci_reset_pri(pdev) && !pci_enable_pri(pdev, prs_allocation))
 		info->pri_enabled = 1;
 #endif
 	if (info->ats_supported && pci_ats_page_aligned(pdev) &&
