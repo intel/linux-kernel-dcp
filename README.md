@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.1
+----------------
+101. iommu/vt-d: Make PRQ size and allocation dynamic (Jacob Pan)
+
 SPR-BKC-PC-v5.12
 ----------------
 100. One IDXD fix (Dave Jiang) and one TDX performance fix (Chao Gao)
