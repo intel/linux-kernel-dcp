@@ -956,6 +956,19 @@ void ioasid_free_all_in_set(struct ioasid_set *set)
 }
 EXPORT_SYMBOL_GPL(ioasid_free_all_in_set);
 
+static struct ioasid_set *ioasid_find_mm_set_locked(struct mm_struct *token)
+{
+	struct ioasid_set *set;
+	unsigned long index;
+
+	xa_for_each(&ioasid_sets, index, set) {
+		if (set->type == IOASID_SET_TYPE_MM && set->token == token)
+			return set;
+	}
+
+	return NULL;
+}
+
 /*
  * ioasid_find_mm_set - Retrieve IOASID set with mm token
  * Take a reference of the set if found.
@@ -963,17 +976,11 @@ EXPORT_SYMBOL_GPL(ioasid_free_all_in_set);
 struct ioasid_set *ioasid_find_mm_set(struct mm_struct *token)
 {
 	struct ioasid_set *set;
-	unsigned long index;
 
 	spin_lock(&ioasid_allocator_lock);
-
-	xa_for_each(&ioasid_sets, index, set) {
-		if (set->type == IOASID_SET_TYPE_MM && set->token == token)
-			goto exit_unlock;
-	}
-	set = NULL;
-exit_unlock:
+	set = ioasid_find_mm_set_locked(token);
 	spin_unlock(&ioasid_allocator_lock);
+
 	return set;
 }
 EXPORT_SYMBOL_GPL(ioasid_find_mm_set);
@@ -1246,6 +1253,7 @@ int ioasid_register_notifier_mm(struct mm_struct *mm, struct notifier_block *nb)
 	struct ioasid_set *set;
 	int ret = 0;
 
+	spin_lock(&ioasid_allocator_lock);
 	spin_lock(&ioasid_nb_lock);
 	/* Check for duplicates, nb is unique per set */
 	list_for_each_entry(curr, &ioasid_nb_pending_list, list) {
@@ -1265,7 +1273,7 @@ int ioasid_register_notifier_mm(struct mm_struct *mm, struct notifier_block *nb)
 	curr->nb = nb;
 
 	/* Check if the token has an existing set */
-	set = ioasid_find_mm_set(mm);
+	set = ioasid_find_mm_set_locked(mm);
 	if (!set) {
 		/* Add to the rsvd list as inactive */
 		curr->active = false;
@@ -1292,6 +1300,7 @@ exit_free:
 	kfree(curr);
 exit_unlock:
 	spin_unlock(&ioasid_nb_lock);
+	spin_unlock(&ioasid_allocator_lock);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(ioasid_register_notifier_mm);
