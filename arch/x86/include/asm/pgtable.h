@@ -57,6 +57,9 @@ extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
 	__visible;
 #define ZERO_PAGE(vaddr) ((void)(vaddr),virt_to_page(empty_zero_page))
 
+extern bool __read_mostly forbids_zeropage;
+#define mm_forbids_zeropage(x)	forbids_zeropage
+
 extern spinlock_t pgd_lock;
 extern struct list_head pgd_list;
 

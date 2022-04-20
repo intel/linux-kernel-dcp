@@ -44,6 +44,7 @@
 #include <linux/sync_core.h>
 #include <linux/task_work.h>
 #include <linux/hardirq.h>
+#include <linux/pgtable.h>
 
 #include <asm/intel-family.h>
 #include <asm/processor.h>
@@ -1304,6 +1305,11 @@ static void queue_task_work(struct mce *m, char *msg, int kill_current_task)
 	/* Do not call task_work_add() more than once */
 	if (count > 1)
 		return;
+
+	if (is_zero_pfn(current->mce_addr >> PAGE_SHIFT) && !forbids_zeropage) {
+		pr_err("Forbid user-space process from using zero page\n");
+		forbids_zeropage = true;
+	}
 
 	task_work_add(current, &current->mce_kill_me, TWA_RESUME);
 }

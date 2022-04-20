@@ -1639,7 +1639,7 @@ try_again:
 		goto unlock_mutex;
 	}
 
-	if (TestSetPageHWPoison(p)) {
+	if (TestSetPageHWPoison(p) || is_zero_pfn(pfn)) {
 		pr_err("Memory failure: %#lx: already hardware poisoned\n",
 			pfn);
 		res = -EHWPOISON;
