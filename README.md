@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.3
+----------------
+103. IDXD fixes (Dave Jiang)
+
 SPR-BKC-PC-v6.2
 ----------------
 102. x86/mm: Forbid the zero page once it has uncorrectable errors (Qiuxu Zhuo)
