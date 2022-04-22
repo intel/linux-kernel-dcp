@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+=======
+SPR-BKC-PC-v6.4
+----------------
+105. TDX attestation fix (Chenyi Qiang)
+
 SPR-BKC-PC-v6.3
 ----------------
 103. IDXD fixes (Dave Jiang)
