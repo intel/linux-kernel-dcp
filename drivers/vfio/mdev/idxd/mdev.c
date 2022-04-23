@@ -1102,6 +1102,7 @@ static int vidxd_register_ioasid_notifier(struct vdcm_idxd *vidxd)
 	list_for_each_entry(mm_entry, &vdev->mm_list, node) {
 		if (mm_entry->mm == mm) {
 			mutex_unlock(&vdev->ioasid_lock);
+			mmput(mm);
 			return 0;
 		}
 	}
@@ -1117,12 +1118,12 @@ static int vidxd_register_ioasid_notifier(struct vdcm_idxd *vidxd)
 	vidxd->ivdev.pasid_nb.priority = IOASID_PRIO_DEVICE;
 	vidxd->ivdev.pasid_nb.notifier_call = idxd_mdev_ioasid_event;
 	rc = ioasid_register_notifier_mm(mm, &vidxd->ivdev.pasid_nb);
-	mmput(mm);
 	if (rc < 0)
 		goto err_ioasid;
 
 	list_add(&mm_entry->node, &vdev->mm_list);
 	mutex_unlock(&vdev->ioasid_lock);
+	mmput(mm);
 
 	return 0;
 
