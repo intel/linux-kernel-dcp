@@ -1453,7 +1453,7 @@ static int idxd_vdcm_mmap(struct vfio_device *vdev, struct vm_area_struct *vma)
 
 static void vidxd_vdcm_reset(struct vdcm_idxd *vidxd)
 {
-	vidxd_reset(vidxd);
+	vidxd_reset(vidxd, false);
 }
 
 static irqreturn_t idxd_vdcm_msix_handler(int irq, void *arg)
