@@ -18,7 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
-=======
+SPR-BKC-PC-v6.5
+----------------
+106. X86: FPU: Matches init_fpstate::xcomp_bv with default allocated xsave components (Yuan Yao)
+107. vfio: mdev: idxd: fix mm ref leak (Dave Jiang)
+
 SPR-BKC-PC-v6.4
 ----------------
 105. TDX attestation fix (Chenyi Qiang)
