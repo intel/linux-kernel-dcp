@@ -1414,6 +1414,13 @@ restart:
 	wait_desc.qw2 = 0;
 	wait_desc.qw3 = 0;
 
+	if ((desc[count - 1].qw0 & 0xF) == 9) {
+		if ((desc[count - 1].qw0 & 0xF000) == 0)
+			iommu->num_prrs++;
+		else if ((desc[count - 1].qw0 & 0xF000) == 0x1000)
+			iommu->num_prri++;
+	}
+
 	offset = wait_index << shift;
 	memcpy(qi->desc + offset, &wait_desc, 1 << shift);
 

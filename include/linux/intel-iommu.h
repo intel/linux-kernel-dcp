@@ -625,6 +625,10 @@ struct intel_iommu {
 	unsigned char prq_name[16];    /* Name for PRQ interrupt */
 	struct completion prq_complete;
 	struct ioasid_allocator_ops pasid_allocator; /* Custom allocator for PASIDs */
+	unsigned long num_prqs; /* Page Req */
+	unsigned long num_prrs; /* Page Resp SUCCESS */
+	unsigned long num_prri; /* Page Resp INVALID */
+
 #endif
 	struct q_inval  *qi;            /* Queued invalidation info */
 	u32 *iommu_state; /* Store iommu states between suspend and resume.*/

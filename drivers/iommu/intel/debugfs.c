@@ -426,6 +426,9 @@ static int invalidation_queue_show(struct seq_file *m, void *unused)
 			   (u64)virt_to_phys(qi->desc),
 			   dmar_readq(iommu->reg + DMAR_IQH_REG) >> shift,
 			   dmar_readq(iommu->reg + DMAR_IQT_REG) >> shift);
+		seq_printf(m, "No. of received PRQs: %ld\n", iommu->num_prqs);
+		seq_printf(m, "No. of PRR SUCCESS sent: %ld\n", iommu->num_prrs);
+		seq_printf(m, "No. of PRR INVALID sent: %ld\n", iommu->num_prri);
 		invalidation_queue_entry_show(m, iommu);
 		raw_spin_unlock_irqrestore(&qi->q_lock, flags);
 		seq_putc(m, '\n');
@@ -776,6 +779,9 @@ static ssize_t dmar_perf_latency_write(struct file *filp,
 			dmar_latency_disable(iommu, DMAR_LATENCY_INV_DEVTLB);
 			dmar_latency_disable(iommu, DMAR_LATENCY_INV_IEC);
 			dmar_latency_disable(iommu, DMAR_LATENCY_PRQ);
+			iommu->num_prqs = 0;
+			iommu->num_prrs = 0;
+			iommu->num_prri = 0;
 		}
 		rcu_read_unlock();
 		break;

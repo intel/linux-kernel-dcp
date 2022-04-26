@@ -1116,6 +1116,7 @@ static irqreturn_t prq_event_thread(int irq, void *d)
 		vm_fault_t ret;
 		u64 address;
 
+		iommu->num_prqs++;
 		handled = 1;
 		req = &iommu->prq[head / sizeof(*req)];
 		result = QI_RESP_INVALID;
