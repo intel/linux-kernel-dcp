@@ -441,9 +441,13 @@ int intel_svm_bind_gpasid(struct iommu_domain *domain,
 	 * be able to handle prq. And this should be outside of pasid_mutex
 	 * to avoid race with page response and prq reporting.
 	 */
-	if (is_aux_domain(dev, domain) && fault_data)
-		iommu_add_device_fault_data(dev, data->hpasid,
-					    fault_data);
+	if (is_aux_domain(dev, domain) && fault_data) {
+		ret = iommu_add_device_fault_data(dev, data->hpasid,
+						  fault_data);
+		if (ret)
+			return ret;
+	}
+
 	mutex_lock(&pasid_mutex);
 	ret = pasid_to_svm_sdev(dev, pasid_set,
 				data->hpasid, &svm, &sdev);

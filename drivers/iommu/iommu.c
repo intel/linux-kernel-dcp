@@ -1231,6 +1231,12 @@ int iommu_add_device_fault_data(struct device *dev,
 
 	mutex_lock(&param->lock);
 
+	ret = ioasid_get(NULL, vector);
+	if (ret) {
+		dev_err(dev, "Failed to get vector %d\n", vector);
+		goto unlock;
+	}
+
 	/* vector must be unique, check if we have the same vector already */
 	list_for_each_entry(hdata, &param->fault_param->data, list) {
 		if (hdata->vector == vector) {
@@ -1291,6 +1297,7 @@ void iommu_delete_device_fault_data(struct device *dev, int vector)
 			list_del(&hdata->list);
 			kfree(hdata);
 			dev_dbg(dev, "Deleted IOMMU fault handler data for vector %d\n", vector);
+			ioasid_put(NULL, vector);//vector == pasid
 			goto unlock;
 		}
 	}
