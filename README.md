@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.9
+----------------
+111. iommu/vtd-: Fix regression issue in intel_svm_free_async_fn (Yi Liu)
+
 SPR-BKC-PC-v6.8
 ----------------
 110. Enhance intel-idle C states (Artem Bityutskiy)
