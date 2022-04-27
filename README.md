@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.7
+----------------
+109. Two IOMMU VT-D fixes (Yi Liu)
+
 SPR-BKC-PC-v6.6
 ----------------
 108. vfio: mdev: idxd: fix soft reset for guest (Dave Jiang)
