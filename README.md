@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.8
+----------------
+110. Enhance intel-idle C states (Artem Bityutskiy)
+
 SPR-BKC-PC-v6.7
 ----------------
 109. Two IOMMU VT-D fixes (Yi Liu)
