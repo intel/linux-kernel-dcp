@@ -116,8 +116,8 @@ static DEFINE_MUTEX(pasid_mutex);
 static void intel_svm_free_async_fn(struct work_struct *work)
 {
 	struct intel_svm *svm = container_of(work, struct intel_svm, work);
-	struct intel_svm_dev *sdev, *tmp;
-	LIST_HEAD(sdevs);
+	struct intel_svm_dev *sdev, *subdev, *tmp;
+	LIST_HEAD(subdevs);
 	u32 pasid = svm->pasid;
 
 	/*
@@ -133,11 +133,21 @@ static void intel_svm_free_async_fn(struct work_struct *work)
 					svm->pasid, true, false);
 		intel_svm_drain_prq(sdev->dev, svm->pasid);
 		spin_unlock(&sdev->iommu->lock);
-		/*
-		 * Record the sdev and delete device_fault_data outside pasid_mutex
-		 * protection to avoid race with page response and prq reporting.
-		 */
-		list_add_tail(&sdev->list, &sdevs);
+		if (is_aux_domain(sdev->dev, &sdev->domain->domain)) {
+			subdev = kzalloc(sizeof(*subdev), GFP_KERNEL);
+			if (!subdev) {
+				dev_err_ratelimited(sdev->dev, "Failed to record for fault data del %u\n", pasid);
+				continue;
+			}
+			subdev->dev = sdev->dev;
+
+			kfree_rcu(sdev, rcu);
+			/*
+			 * Record the sdev and delete device_fault_data outside pasid_mutex
+			 * protection to avoid race with page response and prq reporting.
+			 */
+			list_add_tail(&subdev->list, &subdevs);
+		}
 	}
 	/*
 	 * We may not be the last user to drop the reference but since
@@ -158,14 +168,14 @@ static void intel_svm_free_async_fn(struct work_struct *work)
 
 	mutex_unlock(&pasid_mutex);
 
-	list_for_each_entry_safe(sdev, tmp, &sdevs, list) {
-		list_del(&sdev->list);
+	list_for_each_entry_safe(subdev, tmp, &subdevs, list) {
+		list_del(&subdev->list);
 		/*
 		 * Partial assignment needs to delete fault data
 		 */
-		if (is_aux_domain(sdev->dev, &sdev->domain->domain))
-			iommu_delete_device_fault_data(sdev->dev, pasid);
-		kfree_rcu(sdev, rcu);
+		dev_dbg(subdev->dev, "try to del fault data for %u\n", pasid);
+		iommu_delete_device_fault_data(subdev->dev, pasid);
+		kfree(subdev);
 	}
 }
 
