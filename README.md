@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.11
+----------------
+113. x86/tdx: Add vsock to TDX device filter's allow list (Alexander Shishkin)
+
 SPR-BKC-PC-v6.10
 ----------------
 112. Updated: Slow down split lockers (Tony Luck)
