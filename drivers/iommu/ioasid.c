@@ -594,6 +594,10 @@ static void ioasid_add_pending_nb(struct ioasid_set *set)
 	 */
 	list_for_each_entry(curr, &ioasid_nb_pending_list, list) {
 		if (curr->token == set->token && !curr->active) {
+			if (unlikely(!func_ptr_is_kernel_text(curr->nb->notifier_call))) {
+				pr_warn("Invalid notifier callback");
+				continue;
+			}
 			atomic_notifier_chain_register(&set->nh, curr->nb);
 			curr->set = set;
 			curr->active = true;
@@ -1294,6 +1298,12 @@ int ioasid_register_notifier_mm(struct mm_struct *mm, struct notifier_block *nb)
 		}
 	}
 
+	if (unlikely(!func_ptr_is_kernel_text(nb->notifier_call))) {
+		pr_warn("Registering invalid callback!");
+		dump_stack();
+		ret = -EINVAL;
+		goto exit_unlock;
+	}
 	curr = kzalloc(sizeof(*curr), GFP_ATOMIC);
 	if (!curr) {
 		ret = -ENOMEM;

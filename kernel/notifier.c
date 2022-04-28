@@ -76,6 +76,7 @@ static int notifier_call_chain(struct notifier_block **nl,
 #ifdef CONFIG_DEBUG_NOTIFIERS
 		if (unlikely(!func_ptr_is_kernel_text(nb->notifier_call))) {
 			WARN(1, "Invalid notifier called!");
+			pr_alert("%s: nb call %llx", __func__, (u64)nb->notifier_call);
 			nb = next_nb;
 			continue;
 		}
