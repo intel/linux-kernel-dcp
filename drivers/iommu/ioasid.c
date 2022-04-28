@@ -1211,6 +1211,39 @@ int ioasid_register_notifier(struct ioasid_set *set, struct notifier_block *nb)
 }
 EXPORT_SYMBOL_GPL(ioasid_register_notifier);
 
+/*
+ *  atomic_notifier_chain_unregister() will eventually call synchronize_rcu()
+ *  which is not suitable in a lock critical area. Release the lock before
+ *  calling atomic_notifier_chain_unregister() and reaquire it after it.
+ */
+static void unregister_notifier_locked(struct ioasid_set *set,
+				       struct notifier_block *nb)
+{
+	assert_spin_locked(&ioasid_allocator_lock);
+
+	/*
+	 * The set might be released once we put the lock down and result in
+	 * set->nh an invalid reference. Keep a reference of set before
+	 * unlock and drop it afterward.
+	 */
+	if (set) {
+		atomic_inc(&set->nr_ioasids);
+
+		spin_unlock(&ioasid_allocator_lock);
+		atomic_notifier_chain_unregister(&set->nh, nb);
+		spin_lock(&ioasid_allocator_lock);
+
+		if (atomic_dec_and_test(&set->nr_ioasids))
+			ioasid_set_free_locked(set);
+
+		return;
+	}
+
+	spin_unlock(&ioasid_allocator_lock);
+	atomic_notifier_chain_unregister(&ioasid_notifier, nb);
+	spin_lock(&ioasid_allocator_lock);
+}
+
 void ioasid_unregister_notifier(struct ioasid_set *set,
 				struct notifier_block *nb)
 {
@@ -1228,10 +1261,7 @@ void ioasid_unregister_notifier(struct ioasid_set *set,
 		}
 	}
 
-	if (set)
-		atomic_notifier_chain_unregister(&set->nh, nb);
-	else
-		atomic_notifier_chain_unregister(&ioasid_notifier, nb);
+	unregister_notifier_locked(set, nb);
 out_unlock:
 	spin_unlock(&ioasid_allocator_lock);
 }
@@ -1319,10 +1349,8 @@ void ioasid_unregister_notifier_mm(struct mm_struct *mm, struct notifier_block *
 	list_for_each_entry(curr, &ioasid_nb_pending_list, list) {
 		if (curr->token == mm && curr->nb == nb) {
 			list_del(&curr->list);
-			if (curr->active) {
-				atomic_notifier_chain_unregister(&curr->set->nh,
-								 nb);
-			}
+			if (curr->active)
+				unregister_notifier_locked(curr->set, nb);
 			kfree(curr);
 			break;
 		}
