@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v6.12
+----------------
+114. SDSI fixes (David Box)
+
 SPR-BKC-PC-v6.11
 ----------------
 113. x86/tdx: Add vsock to TDX device filter's allow list (Alexander Shishkin)
