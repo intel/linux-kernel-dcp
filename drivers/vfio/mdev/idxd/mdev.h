@@ -166,7 +166,7 @@ int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int s
 int vidxd_cfg_read(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int count);
 int vidxd_cfg_write(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int size);
 void vidxd_mmio_init(struct vdcm_idxd *vidxd);
-void vidxd_reset(struct vdcm_idxd *vidxd, bool interrupt);
+void vidxd_reset(struct vdcm_idxd *vidxd);
 void vidxd_send_interrupt(struct vdcm_idxd *vidxd, int msix_idx);
 void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
 

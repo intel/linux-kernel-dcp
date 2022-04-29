@@ -29,8 +29,7 @@ void vidxd_send_interrupt(struct vdcm_idxd *vidxd, int msix_idx)
 {
 	struct vfio_pci_core_device *vfio_pdev = &vidxd->vfio_pdev;
 
-	if (vfio_pdev->ctx[msix_idx].trigger)
-		eventfd_signal(vfio_pdev->ctx[msix_idx].trigger, 1);
+	eventfd_signal(vfio_pdev->ctx[msix_idx].trigger, 1);
 }
 
 static void vidxd_report_error(struct vdcm_idxd *vidxd, unsigned int error)
@@ -814,8 +813,7 @@ void vidxd_mmio_init(struct vdcm_idxd *vidxd)
 	vidxd_mmio_init_wqcfg(vidxd);
 }
 
-static void __idxd_complete_command(struct vdcm_idxd *vidxd, enum idxd_cmdsts_err val,
-				    bool interrupt)
+static void idxd_complete_command(struct vdcm_idxd *vidxd, enum idxd_cmdsts_err val)
 {
 	u8 *bar0 = vidxd->bar0;
 	u32 *cmd = (u32 *)(bar0 + IDXD_CMD_OFFSET);
@@ -829,14 +827,8 @@ static void __idxd_complete_command(struct vdcm_idxd *vidxd, enum idxd_cmdsts_er
 
 	if (*cmd & IDXD_CMD_INT_MASK) {
 		*intcause |= IDXD_INTC_CMD;
-		if (interrupt)
-			vidxd_send_interrupt(vidxd, 0);
+		vidxd_send_interrupt(vidxd, 0);
 	}
-}
-
-static void idxd_complete_command(struct vdcm_idxd *vidxd, enum idxd_cmdsts_err val)
-{
-	__idxd_complete_command(vidxd, val, true);
 }
 
 static void vidxd_enable(struct vdcm_idxd *vidxd)
@@ -982,7 +974,7 @@ static void vidxd_wq_abort(struct vdcm_idxd *vidxd, int val)
 	idxd_complete_command(vidxd, IDXD_CMDSTS_SUCCESS);
 }
 
-void vidxd_reset(struct vdcm_idxd *vidxd, bool interrupt)
+void vidxd_reset(struct vdcm_idxd *vidxd)
 {
 	struct mdev_device *mdev = vidxd->ivdev.mdev;
 	struct device *dev = mdev_dev(mdev);
@@ -1005,7 +997,7 @@ void vidxd_reset(struct vdcm_idxd *vidxd, bool interrupt)
 
 	vidxd_mmio_reset(vidxd);
 	gensts->state = IDXD_DEVICE_STATE_DISABLED;
-	__idxd_complete_command(vidxd, IDXD_CMDSTS_SUCCESS, interrupt);
+	idxd_complete_command(vidxd, IDXD_CMDSTS_SUCCESS);
 }
 
 static void vidxd_wq_reset(struct vdcm_idxd *vidxd, int wq_id_mask)
@@ -1363,7 +1355,7 @@ static void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val)
 		vidxd_abort_all(vidxd);
 		break;
 	case IDXD_CMD_RESET_DEVICE:
-		vidxd_reset(vidxd, true);
+		vidxd_reset(vidxd);
 		break;
 	case IDXD_CMD_ENABLE_WQ:
 		vidxd_wq_enable(vidxd, reg->operand);
