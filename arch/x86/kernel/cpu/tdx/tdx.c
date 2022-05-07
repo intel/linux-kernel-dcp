@@ -1550,6 +1550,7 @@ release:
 int tdx_module_reload(void)
 {
 	int ret, cpu;
+	int vmxoff_err;
 
 	cpus_read_lock();
 	/*
@@ -1562,21 +1563,25 @@ int tdx_module_reload(void)
 		goto unlock;
 	}
 
-	ret = tdx_load_module_late();
+	ret = seam_vmxon_on_each_cpu();
 	if (ret)
 		goto unlock;
+
+	ret = tdx_load_module_late();
+	if (ret)
+		goto vmxoff;
 
 	ret = tdx_init_system();
 	if (ret)
-		goto unlock;
+		goto vmxoff;
 
 	ret = tdx_get_system_info();
 	if (ret)
-		goto unlock;
+		goto vmxoff;
 
 	ret = __tdx_init_module();
 	if (ret)
-		goto unlock;
+		goto vmxoff;
 
 	/* Reset to default values so that their support will be re-probed */
 	is_nonarch_seamcall_available = true;
@@ -1589,6 +1594,13 @@ int tdx_module_reload(void)
 	for_each_online_cpu(cpu)
 		set_cpu_cap(&cpu_data(cpu), X86_FEATURE_TDX);
 
+vmxoff:
+	vmxoff_err = seam_vmxoff_on_each_cpu();
+	if (vmxoff_err) {
+		pr_info("Failed to VMXOFF.\n");
+		if (!ret)
+			ret = vmxoff_err;
+	}
 unlock:
 	cpus_read_unlock();
 	return ret;
@@ -1602,16 +1614,12 @@ static ssize_t tdx_module_reload_store(struct kobject *kobj,
 {
 	unsigned long val;
 	ssize_t ret;
-	int vmxoff_err;
 
 	ret = kstrtoul(buf, 0, &val);
 	if (ret)
 		return ret;
 
 	mutex_lock(&tdx_mutex);
-	ret = seam_vmxon_on_each_cpu();
-	if (ret)
-		goto unlock;
 
 	switch (val) {
 	case TDX_MODULE_RELOAD:
@@ -1621,13 +1629,6 @@ static ssize_t tdx_module_reload_store(struct kobject *kobj,
 	default:
 		ret = -EINVAL;
 	}
-	vmxoff_err = seam_vmxoff_on_each_cpu();
-	if (vmxoff_err) {
-		pr_info("Failed to VMXOFF.\n");
-		if (!ret)
-			ret = vmxoff_err;
-	}
-unlock:
 	mutex_unlock(&tdx_mutex);
 
 	if (!ret)
