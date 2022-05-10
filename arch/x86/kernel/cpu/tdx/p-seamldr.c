@@ -173,6 +173,12 @@ static int __init np_seamldr_die_notify(struct notifier_block *nb,
 		pr_err("ip 0x%lx %pS cs 0x%lx ss 0x%lx\n",
 			iret->ip, (void *)iret->ip, iret->cs, iret->ss);
 		regs->cs = __KERNEL_CS;
+
+		/*
+		 * Fix the ss due to the same reason as "rdfsbase" case above
+		 * because the rdfsbase is fixed in NMI ASM handler ASM already.
+		 */
+		regs->ss = __KERNEL_DS;
 		iret->cs = __KERNEL_CS;
 		iret->ss = __KERNEL_DS;
 		return NOTIFY_STOP;

@@ -10,6 +10,7 @@
 #include <asm/unwind_hints.h>
 #include <asm/segment.h>
 #include <asm/errno.h>
+#include <asm/msr-index.h>
 
 /*
  * u64 np_seamldr_launch(unsigned long seamldr_pa, unsigned long seamldr_size)
@@ -78,6 +79,9 @@ SYM_FUNC_START(np_seamldr_launch)
 	 * restore system/control flags and unmask interrupts later.
 	 */
 	pushfq
+
+	rdgsbase %rax
+	movq	%rax, np_seamldr_saved_gs_base(%rip)
 
 	/*
 	 * The NP-SEAMLDR unconditionally sets CR4.PCIDE = 0 and restores CR3
@@ -223,6 +227,10 @@ SYM_FUNC_START(np_seamldr_launch)
 	popq	%rax
 	movq	%rax, %cr3	/* Restore CR3.PCID */
 
+	movq	np_seamldr_saved_gs_base(%rip), %rax
+	wrgsbase %rax
+	movq	$0, np_seamldr_saved_gs_base(%rip)
+
 	popfq	/* Restore system/control flags and unmask interrupts. */
 
 	movq	%r9, %rax	/* Return value from NP-SEAMLDR is in %r9 */
@@ -281,3 +289,6 @@ saved_rbp:
 
 SYM_DATA(np_seamldr_saved_cr4, .quad 0)
 SYM_DATA(np_seamldr_saved_cr0, .quad 0)
+
+.data
+SYM_DATA(np_seamldr_saved_gs_base, .quad 0)
