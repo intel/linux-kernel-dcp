@@ -6906,7 +6906,11 @@ static int write_exit_mmio(struct kvm_vcpu *vcpu, gpa_t gpa,
 {
 	struct kvm_mmio_fragment *frag = &vcpu->mmio_fragments[0];
 
-	memcpy(vcpu->run->mmio.data, frag->data, min(64u, frag->len));
+	if (frag->len > 8) {
+		memcpy(vcpu->run->mmio.np_data, frag->data, min(64u, frag->len));
+	} else {
+		memcpy(vcpu->run->mmio.data, frag->data, min(8u, frag->len));
+	}
 	return X86EMUL_CONTINUE;
 }
 
@@ -10248,8 +10252,13 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
 
 	run->exit_reason = KVM_EXIT_MMIO;
 	run->mmio.phys_addr = frag->gpa;
-	if (vcpu->mmio_is_write)
-		memcpy(run->mmio.data, frag->data, min(64u, frag->len));
+	if (vcpu->mmio_is_write) {
+		if (frag->len > 8) {
+			memcpy(run->mmio.np_data, frag->data, min(64u, frag->len));
+		} else {
+			memcpy(run->mmio.data, frag->data, min(8u, frag->len));
+		}
+	}
 	run->mmio.len = min(64u, frag->len);
 	run->mmio.is_write = vcpu->mmio_is_write;
 	vcpu->arch.complete_userspace_io = complete_emulated_mmio;
@@ -12660,8 +12669,13 @@ static int complete_sev_es_emulated_mmio(struct kvm_vcpu *vcpu)
 	run->mmio.phys_addr = frag->gpa;
 	run->mmio.len = min(64u, frag->len);
 	run->mmio.is_write = vcpu->mmio_is_write;
-	if (run->mmio.is_write)
-		memcpy(run->mmio.data, frag->data, min(64u, frag->len));
+	if (run->mmio.is_write) {
+		if (frag->len > 8) {
+			memcpy(run->mmio.np_data, frag->data, min(64u, frag->len));
+		} else {
+			memcpy(run->mmio.data, frag->data, min(8u, frag->len));
+		}
+	}
 	run->exit_reason = KVM_EXIT_MMIO;
 
 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
@@ -12699,7 +12713,11 @@ int kvm_sev_es_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned int bytes,
 	vcpu->run->mmio.phys_addr = gpa;
 	vcpu->run->mmio.len = min(64u, frag->len);
 	vcpu->run->mmio.is_write = 1;
-	memcpy(vcpu->run->mmio.data, frag->data, min(64u, frag->len));
+	if (frag->len > 8) {
+		memcpy(vcpu->run->mmio.np_data, frag->data, min(64u, frag->len));
+	} else {
+		memcpy(vcpu->run->mmio.data, frag->data, min(8u, frag->len));
+	}
 	vcpu->run->exit_reason = KVM_EXIT_MMIO;
 
 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
