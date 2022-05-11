@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v7.1
+----------------
+116. Fix a few IOMMU issues (Jacob Pan)
+
 SPR-BKC-PC-v6.13
 ----------------
 115. vfio: mdev: idxd: fix vdcm_reset() for vidxd device (Dave Jiang)
