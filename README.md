@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v7.2
+----------------
+117. Add SPR-BKC-PC-v6.config (Fenghua Yu)
+
 SPR-BKC-PC-v7.1
 ----------------
 116. Fix a few IOMMU issues (Jacob Pan)
