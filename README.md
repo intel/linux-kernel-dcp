@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v7.5
+----------------
+120. One CVE fix (Mark Horn)
+
 SPR-BKC-PC-v7.4
 ----------------
 119. kvm: Refine codes to make ABI compatible (Yi Sun)
