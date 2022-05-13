@@ -8,7 +8,6 @@
 #include <asm/cpu_device_id.h>
 
 #include "ifs.h"
-struct ifs_params ifs_params;
 
 #define X86_MATCH(model)					\
 	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(INTEL, 6,		\
@@ -25,7 +24,6 @@ static int __init ifs_init(void)
 {
 	const struct x86_cpu_id *m;
 	u64 ia32_core_caps;
-	int ret;
 
 	/* ifs capability check */
 	m = x86_match_cpu(ifs_cpu_ids);
@@ -35,12 +33,6 @@ static int __init ifs_init(void)
 		return -ENODEV;
 	if (!(ia32_core_caps & MSR_IA32_CORE_CAPS_INTEGRITY))
 		return -ENODEV;
-
-	ret = load_ifs_binary();
-	if (ret) {
-		pr_err("loading ifs binaries failed\n");
-		return ret;
-	}
 
 	return 0;
 }
