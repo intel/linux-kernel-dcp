@@ -1,9 +1,0 @@
-config INTEL_IFS
-	tristate "Intel In Field Scan"
-	depends on X86 && 64BIT && SMP
-	help
-	  Enable support for In Field Scan in Intel CPU to perform core
-	  logic test in the field. To compile this driver as a module, choose
-	  M here. The module will be called intel_ifs.
-
-	  If unsure, say N.
