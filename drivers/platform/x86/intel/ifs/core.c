@@ -279,16 +279,11 @@ static void ifs_first_time(unsigned int cpu)
 
 static int ifs_online_cpu(unsigned int cpu)
 {
-	int ret;
-
 	/* If the CPU is coming online for the first time*/
 	if (per_cpu(ifs_state, cpu).first_time == 0)
 		ifs_first_time(cpu);
 
 	cpumask_clear_cpu(cpu, &(per_cpu(ifs_state, cpu).mask));
-	ret = ifs_sysfs_create(cpu);
-	if (ret)
-		return ret;
 
 	per_cpu(ifs_state, cpu).scan_task = kthread_create_on_node(scan_test_worker, (void *)&cpu,
 								   cpu_to_node(cpu), "ifsCpu/%u",
@@ -312,7 +307,6 @@ static int ifs_offline_cpu(unsigned int cpu)
 
 	if (thread)
 		kthread_stop(thread);
-	ifs_sysfs_remove(cpu);
 
 	return 0;
 }
@@ -338,7 +332,6 @@ static int __init ifs_init(void)
 		return ret;
 	}
 
-	cpu_ifs_init();
 	init_completion(&test_thread_done);
 	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/ifs:online",
 				ifs_online_cpu, ifs_offline_cpu);
@@ -364,7 +357,6 @@ static void __exit ifs_exit(void)
 		if (thread)
 			kthread_stop(thread);
 	}
-	cpu_ifs_exit();
 	cpus_read_unlock();
 	cpuhp_remove_state(cpuhp_scan_state);
 

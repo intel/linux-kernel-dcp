@@ -143,10 +143,6 @@ struct ifs_state {
 DECLARE_PER_CPU(struct ifs_state, ifs_state);
 
 int load_ifs_binary(void);
-void cpu_ifs_init(void);
-void cpu_ifs_exit(void);
-int ifs_sysfs_create(unsigned int cpu);
-void ifs_sysfs_remove(unsigned int cpu);
 extern struct ifs_params ifs_params;
 extern atomic_t siblings_in;
 extern atomic_t siblings_out;
