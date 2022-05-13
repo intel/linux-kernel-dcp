@@ -13,9 +13,6 @@
 
 #include "ifs.h"
 
-#define CREATE_TRACE_POINTS
-#include <trace/events/ifs.h>
-
 static enum cpuhp_state cpuhp_scan_state;
 struct ifs_params ifs_params;
 int cpu_sibl_ct;
@@ -209,8 +206,6 @@ static int scan_test_worker(void *info)
 			 */
 
 			rdmsrl(MSR_SCAN_STATUS, status.data);
-
-			trace_ifs_status(activate, status);
 
 			/* Some cases can be retried, give up for others */
 			if (!can_restart(status))
