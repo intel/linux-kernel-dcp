@@ -6,7 +6,6 @@
 
 #include <linux/firmware.h>
 #include <linux/platform_device.h>
-#include <asm/microcode_intel.h>
 
 #include "ifs.h"
 static const char *ifs_path = "intel/ifs/";
@@ -28,67 +27,6 @@ struct ifs_header {
 #define IFS_HEADER_SIZE	(sizeof(struct ifs_header))
 static struct ifs_header *ifs_header_ptr;	/* pointer to the ifs image header */
 static u64 ifs_hash_ptr;			/* Address of ifs metadata (hash) */
-static int ifs_sanity_check(void *mc)
-{
-	struct microcode_header_intel *mc_header = mc;
-	unsigned long total_size, data_size;
-	u32 sum, i;
-
-	total_size = get_totalsize(mc_header);
-	data_size = get_datasize(mc_header);
-
-	if ((data_size + MC_HEADER_SIZE > total_size) || (total_size % sizeof(u32))) {
-		pr_err("bad ifs data file size.\n");
-		return -EINVAL;
-	}
-
-	if (mc_header->ldrver != 1 || mc_header->hdrver != 1) {
-		pr_err("invalid/unknown ifs update format.\n");
-		return -EINVAL;
-	}
-
-	sum = 0;
-	i = total_size / sizeof(u32);
-	while (i--)
-		sum += ((u32 *)mc)[i];
-
-	if (sum) {
-		pr_err("bad ifs data checksum, aborting.\n");
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static bool find_ifs_matching_signature(struct ucode_cpu_info *uci, void *mc)
-{
-	struct microcode_header_intel *shdr;
-	unsigned int mc_size;
-
-	shdr = (struct microcode_header_intel *)mc;
-	mc_size = get_totalsize(shdr);
-
-	if (!mc_size || ifs_sanity_check(shdr) < 0) {
-		pr_err("ifs sanity check failure\n");
-		return false;
-	}
-
-	if (!cpu_signatures_match(uci->cpu_sig.sig, uci->cpu_sig.pf, shdr->sig, shdr->pf)) {
-		pr_err("ifs signature, pf not matching\n");
-		return false;
-	}
-
-	return true;
-}
-
-static bool ifs_image_sanity_check(void *data)
-{
-	struct ucode_cpu_info uci;
-
-	collect_cpu_info_early(&uci);
-
-	return find_ifs_matching_signature(&uci, data);
-}
 
 static const struct firmware *load_binary(const char *path)
 {
@@ -107,11 +45,6 @@ static const struct firmware *load_binary(const char *path)
 		goto out;
 	}
 
-	if (!ifs_image_sanity_check((void *)fw->data)) {
-		pr_err("ifs header sanity check failed\n");
-		release_firmware(fw);
-		fw = NULL;
-	}
 out:
 	platform_device_unregister(ifs_pdev);
 
