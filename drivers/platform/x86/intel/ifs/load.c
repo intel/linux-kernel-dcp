@@ -261,6 +261,15 @@ out:
 }
 
 /*
+ * Compare the image version whenever loading a new image.
+ * Load the new image only if it is later or equal than the current version.
+ */
+static bool is_newer_binary(int current_loaded_version, struct ifs_header *new_image_ptr)
+{
+	return current_loaded_version <= new_image_ptr->blob_revision;
+}
+
+/*
  * Load ifs image. Before loading ifs module, the ifs image must be located
  * in /lib/firmware/intel/ifs and named as {family/model/stepping}.{testname}.
  */
@@ -277,10 +286,18 @@ int load_ifs_binary(void)
 	if (!scan_fw)
 		return -ENOENT;
 
+	/* only reload new scan image for later version than currently loaded */
+	if (!is_newer_binary(ifs_params.loaded_version, (struct ifs_header *)scan_fw->data)) {
+		pr_warn("Refusing to load older binary");
+		ret = -EINVAL;
+		goto out;
+	}
+
 	ifs_header_ptr = (struct ifs_header *)scan_fw->data;
 	ifs_hash_ptr = (u64)(ifs_header_ptr + 1);
 
 	ret = scan_chunks_sanity_check();
+out:
 	release_firmware(scan_fw);
 
 	return ret;
