@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v7.6
+----------------
+121. Updated IFS (Jithu Joseph and Tony Luck)
+
 SPR-BKC-PC-v7.5
 ----------------
 120. One CVE fix (Mark Horn)
