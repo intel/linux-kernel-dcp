@@ -18,6 +18,12 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v7.7
+----------------
+122. TSC fixes (Feng Tang)
+- b50db7095fe002fa3e16605546cba66bf1b68a3e: x86/tsc: Disable clocksource watchdog for TSC on qualified platorms
+- c86ff8c55b8ae68837b2fa59dc0c203907e9a15f: clocksource: Avoid accidental unstable marking of clocksources
+
 SPR-BKC-PC-v7.6
 ----------------
 121. Updated IFS (Jithu Joseph and Tony Luck)
