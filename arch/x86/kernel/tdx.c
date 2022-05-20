@@ -678,7 +678,8 @@ static int tdx_handle_mmio(struct pt_regs *regs, struct ve_info *ve)
 		if (ret)
 			return -EFAULT;
 		insn_init(&insn, buffer, MAX_INSN_SIZE, 1);
-		insn_get_length(&insn);
+		if (insn_get_length(&insn) < 0)
+			return -EINVAL;
 	}
 
 	mmio = insn_decode_mmio(&insn, &size);
@@ -877,6 +878,7 @@ bool tdx_handle_virtualization_exception(struct pt_regs *regs,
 					 struct ve_info *ve)
 {
 	bool ret = true;
+	int instr_len;
 	u64 val;
 
 	trace_tdx_virtualization_exception_rcuidle(regs->ip, ve->exit_reason,
@@ -913,11 +915,13 @@ bool tdx_handle_virtualization_exception(struct pt_regs *regs,
 		}
 
 		/* Currently only MMIO triggers EPT violation */
-		ve->instr_len = tdx_handle_mmio(regs, ve);
-		if (ve->instr_len < 0) {
+		instr_len = tdx_handle_mmio(regs, ve);
+		if (instr_len < 0) {
 			pr_warn_once("MMIO failed\n");
 			ret = false;
+			break;
 		}
+		ve->instr_len = instr_len;
 		break;
 	case EXIT_REASON_MONITOR_INSTRUCTION:
 	case EXIT_REASON_MWAIT_INSTRUCTION:
