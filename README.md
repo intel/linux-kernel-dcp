@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.2
+----------------
+124. TDX fix (Kuppuswamy Sathyanarayanan)
+
 SPR-BKC-PC-v8.1
 ----------------
 123. af_key fix (Haimin Zhang)
