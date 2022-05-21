@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.1
+----------------
+123. af_key fix (Haimin Zhang)
+- 9a564bccb78a76740ea9d75a259942df8143d02c: add __GFP_ZERO flag for compose_sadb_supported in function pfkey_register
+
 SPR-BKC-PC-v7.7
 ----------------
 122. TSC fixes (Feng Tang)
