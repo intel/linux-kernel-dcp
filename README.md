@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.3
+----------------
+125. TDX fix (Yuan Yao)
+
 SPR-BKC-PC-v8.2
 ----------------
 124. TDX fix (Kuppuswamy Sathyanarayanan)
