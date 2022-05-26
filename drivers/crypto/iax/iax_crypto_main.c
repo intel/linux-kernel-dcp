@@ -413,10 +413,9 @@ static void del_iax_wq(struct iax_device *iax_device, struct idxd_wq *wq)
 
 			pr_debug("%s: removed wq %p from iax_device %p, n_wq %d, nr_iax %d\n", __func__, wq, iax_device, iax_device->n_wq, nr_iax);
 
-			if (iax_device->n_wq == 0) {
+			if (iax_device->n_wq == 0)
 				del_iax_device(iax_device);
-				break;
-			}
+			break;
 		}
 	}
 }
