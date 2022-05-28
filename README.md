@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.5
+----------------
+127. IAX Crypto fix (Tom Zanussi)
+
 SPR-BKC-PC-v8.4
 ----------------
 126. TDX fix (Chao Gao)
