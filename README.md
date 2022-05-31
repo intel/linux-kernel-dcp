@@ -18,6 +18,10 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.6
+----------------
+128. TDX guest security (Alexander Shishkin)
+
 SPR-BKC-PC-v8.5
 ----------------
 127. IAX Crypto fix (Tom Zanussi)
