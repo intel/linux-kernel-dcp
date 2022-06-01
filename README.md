@@ -18,6 +18,12 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.8
+----------------
+130. Bug fixes:
+- KVM: TDX: Check pte zap state before drop large private page (Yuan Yao)
+- kvm/x86: Fix MMIO data mismatch issue (Dong Xiaocheng)
+
 SPR-BKC-PC-v8.7
 ----------------
 129. CVE fixes (Mark Horn)
