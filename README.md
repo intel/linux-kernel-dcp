@@ -18,6 +18,12 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.7
+----------------
+129. CVE fixes (Mark Horn)
+- 3db09e762dc79584a69c10d74a6b98f89a9979f8: net/sched: cls_u32: fix netns refcount changes in u32_change()
+- ee1fee900537b5d9560e9f937402de5ddc8412f3: ptrace: Check PTRACE_O_SUSPEND_SECCOMP permission on PTRACE_SEIZE
+
 SPR-BKC-PC-v8.6
 ----------------
 128. TDX guest security (Alexander Shishkin)
