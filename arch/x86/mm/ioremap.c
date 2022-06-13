@@ -261,7 +261,8 @@ __ioremap_caller(resource_size_t phys_addr, unsigned long size,
 	prot = PAGE_KERNEL_IO;
 	if ((io_desc.flags & IORES_MAP_ENCRYPTED) || encrypted)
 		prot = pgprot_encrypted(prot);
-	else if (shared || ioremap_force_shared || !cc_platform_has(CC_ATTR_GUEST_DEVICE_FILTER))
+	else if (cc_platform_has(CC_ATTR_GUEST_TDX) &&
+		 (shared || ioremap_force_shared || !cc_platform_has(CC_ATTR_GUEST_DEVICE_FILTER)))
 		prot = pgprot_cc_guest(prot);
 
 	switch (pcm) {
