@@ -36,7 +36,12 @@ static void detect_intel_tdx(void)
 {
 	u32 eax, sig[3];
 
-	cpuid_count(TDX_CPUID_LEAF_ID, 0, &eax, &sig[0], &sig[2], &sig[1]);
+	asm volatile(".ifnc %%ebx,%3 ; movl  %%ebx,%3 ; .endif	\n\t"
+		     "cpuid					\n\t"
+		     ".ifnc %%ebx,%3 ; xchgl %%ebx,%3 ; .endif	\n\t"
+		    : "=a" (eax), "=c" (sig[2]), "=d" (sig[1]), "=b" (sig[0])
+		    : "a" (TDX_CPUID_LEAF_ID), "c" (0)
+	);
 
 	if (memcmp("IntelTDX    ", sig, 12))
 		return;
