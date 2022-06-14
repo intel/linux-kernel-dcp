@@ -63,24 +63,19 @@ EXPORT_SYMBOL_GPL(vmptrld_error);
 
 int raw_vmcs_store(u64 *vmcs_pa)
 {
-	bool ret;
 	bool fault = 0;
 
-	asm volatile("1: vmptrst %1\n\t"
+	asm volatile("1: vmptrst %0\n\t"
 		     "2:\n\t"
 		     ".pushsection .fixup, \"ax\"\n\t"
-		     "3: mov $1, %2\n\t"
+		     "3: mov $1, %1\n\t"
 		     "jmp 2b\n\t"
 		     ".popsection\n\t"
 		     _ASM_EXTABLE(1b, 3b)
-		     CC_SET(na)
-		     : CC_OUT(na) (ret), "=m" (*vmcs_pa), "=r" (fault) : :);
+		     : "=m" (*vmcs_pa), "+r" (fault) : :);
 
 	if (fault) {
 		virt_spurious_fault();
-		return -EIO;
-	} else if (ret) {
-		vmx_insn_failed("vmptrst failed: %p\n", vmcs_pa);
 		return -EIO;
 	}
 
