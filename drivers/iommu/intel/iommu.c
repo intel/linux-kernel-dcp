@@ -62,7 +62,7 @@ static int prs_allocation = 32;
  * in total to prevent PRQ overflow in the worst case.
  * For default 32 entries per dev,8 KB should be enough.
  */
-int prq_size_page_order = 1;
+int prq_size_page_order = 4;
 
 #define IS_GFX_DEVICE(pdev) ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY)
 #define IS_USB_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_SERIAL_USB)
