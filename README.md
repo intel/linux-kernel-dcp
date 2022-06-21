@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.10
+----------------
+132. Bug fixe:
+- X86: VIRTEXT: Fix false alarm of vmptrst failure in raw_vmcs_store()
+
 SPR-BKC-PC-v8.9
 ----------------
 131. Bug fixe:
