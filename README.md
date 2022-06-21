@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v8.9
+----------------
+131. Bug fixe:
+- x86: MM: Use pgprot_cc_guest() in __ioremap_caller() for TDX guest only
+
 SPR-BKC-PC-v8.8
 ----------------
 130. Bug fixes:
