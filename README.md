@@ -18,14 +18,19 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v9.1
+----------------
+133. Bug fix (Yuan Yao):
+- KVM: X86/MMU: Fix incorrect page level while split large private page.
+
 SPR-BKC-PC-v8.10
 ----------------
-132. Bug fixe:
+132. Bug fix:
 - X86: VIRTEXT: Fix false alarm of vmptrst failure in raw_vmcs_store()
 
 SPR-BKC-PC-v8.9
 ----------------
-131. Bug fixe:
+131. Bug fix:
 - x86: MM: Use pgprot_cc_guest() in __ioremap_caller() for TDX guest only
 
 SPR-BKC-PC-v8.8
