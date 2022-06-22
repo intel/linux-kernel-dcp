@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v9.2
+----------------
+134. Bug fix (Elena Reshetova):
+- efi/x86-stub: fix absolute symbol reference
+
 SPR-BKC-PC-v9.1
 ----------------
 133. Bug fix (Yuan Yao):
