@@ -18,6 +18,12 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v9.3
+----------------
+135. Bug fix (Reinette Chatre):
+- commit: 8795359e35bc33bf86b6d0765aa7f37431db3b9c
+  x86/sgx: Silence softlockup detection when releasing large enclaves
+
 SPR-BKC-PC-v9.2
 ----------------
 134. Bug fix (Elena Reshetova):
