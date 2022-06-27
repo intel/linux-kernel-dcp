@@ -4538,6 +4538,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
 	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
 	    !kvm_is_visible_memslot(slot)) {
 		*pfn = KVM_PFN_NOSLOT;
+		*writable = false;
 		return false;
 	}
 
