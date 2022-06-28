@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v9.5
+----------------
+137. iommu/vt-d: Size Page Request Queue to avoid overflow condition (Baolu Lu)
+- Upstream commit: 48811c44349ffbb778d3e36b53beb03ad43a979c
+
 SPR-BKC-PC-v9.4
 ----------------
 136. Revert "tdx: Prevent non-expected CPUIDs from propagating to VMM" (Jialei Feng)
