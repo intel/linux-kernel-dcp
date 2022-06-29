@@ -18,6 +18,11 @@ Use at your own risk.
 Release History
 ===============
 
+SPR-BKC-PC-v9.6
+----------------
+138. TDX fix (Yuan Yao):
+- KVM: TDX: MMU: Set writable = false for all MMIO accessing EPT violation
+
 SPR-BKC-PC-v9.5
 ----------------
 137. iommu/vt-d: Size Page Request Queue to avoid overflow condition (Baolu Lu)
